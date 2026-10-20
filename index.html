@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Premium Calculator & Policy Illustration</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="head-inner">
+        <div class="brand">
+          <span class="brand-icon">◆</span>
+          <div>
+            <strong>STATE LIFE</strong
+            ><small>PREMIUM PLANNING & ILLUSTRATION</small>
+          </div>
+        </div>
+        <span class="tagline">Secure Today<br />Brighter Tomorrow</span>
+      </div>
+    </header>
+    <main class="shell">
+      <div class="intro">
+        <span class="eyebrow">INSURANCE PLANNING TOOL</span>
+        <h1>Premium Calculator</h1>
+        <p>
+          Calculate an estimated premium and generate a beautifully formatted
+          policy illustration.
+        </p>
+      </div>
+      <section class="main-grid">
+        <div class="panel">
+          <div class="section-heading">
+            <h2>Policy Information</h2>
+            <p>Enter the policy holder's details below.</p>
+          </div>
+          <form id="calculator" novalidate>
+            <div class="fields">
+              <div class="field full">
+                <label for="name">Full Name</label
+                ><input
+                  id="name"
+                  maxlength="100"
+                  required
+                  placeholder="Enter policy holder name"
+                  autocomplete="name"
+                />
+              </div>
+              <div class="field">
+                <label for="dob">Date of Birth</label
+                ><input id="dob" type="date" required />
+              </div>
+              <div class="field">
+                <label for="age">Age (Auto)</label
+                ><input
+                  id="age"
+                  readonly
+                  placeholder="Calculated automatically"
+                />
+              </div>
+              <div class="field">
+                <label for="gender">Gender</label
+                ><select id="gender" required>
+                  <option value="">Select gender</option>
+                  <option>Male</option>
+                  <option>Female</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="term">Policy Plan</label
+                ><select id="term" required>
+                  <option value="">Select plan</option>
+                  <option value="03_10">03 / 10</option>
+                  <option value="03_15">03 / 15</option>
+                  <option value="03_20">03 / 20</option>
+                  <option value="81_20">81 / 20</option>
+                  <option value="PLATINUM_91">Platinum 91 / 10</option>
+                </select>
+              </div>
+              <div class="field full">
+                <label for="sum">Sum Assured (PKR)</label
+                ><input
+                  id="sum"
+                  type="number"
+                  min="1"
+                  max="1000000000"
+                  step="1"
+                  placeholder="e.g. 1000000"
+                  required
+                />
+              </div>
+            </div>
+            <div id="error" class="error" role="alert"></div>
+            <div class="buttons">
+              <button type="submit" class="btn primary">
+                ▦ &nbsp; Calculate Premium</button
+              ><button type="reset" class="btn outline">↻ &nbsp; Reset</button>
+            </div>
+          </form>
+        </div>
+        <div class="panel result-panel">
+          <div class="section-heading">
+            <h2>Calculation Result</h2>
+            <p>Policy summary and premium estimate</p>
+          </div>
+          <div id="empty" class="empty">
+            <span class="empty-icon">▤</span>
+            <h3>Ready to calculate</h3>
+            <p>
+              Complete the form to view the policy estimate and generate your
+              illustration.
+            </p>
+          </div>
+          <div id="results" hidden>
+            <div class="stat-grid">
+              <div class="stat">
+                <span>Calculated Age</span><strong id="r-age">—</strong>
+              </div>
+              <div class="stat">
+                <span>Policy Term</span><strong id="r-term">—</strong>
+              </div>
+              <div class="stat">
+                <span>Sum Assured</span><strong id="r-sum">—</strong>
+              </div>
+              <div class="stat">
+                <span>Rate per Rs 1,000</span><strong id="r-rate">—</strong>
+              </div>
+            </div>
+            <div class="premium-block">
+              <span>Estimated Annual Premium</span
+              ><strong id="r-premium">—</strong
+              ><small
+                >Profession charges excluded · Rs 100 fixed addition
+                included</small
+              >
+            </div>
+            <div class="buttons stacked">
+              <button id="generate" type="button" class="btn green">
+                ▤ &nbsp; Generate Policy Illustration</button
+              ><button id="download" type="button" class="btn outline">
+                ↓ &nbsp; Download PDF
+              </button>
+            </div>
+          </div>
+          <p class="notice">
+            Independent design prototype. Rates are from the supplied sample
+            table; not a verified insurer quotation.
+          </p>
+        </div>
+      </section>
+      <section id="illustration" class="illustration" hidden>
+        <div class="illustration-actions">
+          <div><h2>Policy Benefit Illustration</h2><p>Approved design · dynamic policy illustration</p></div>
+          <div class="action-group">
+            <button id="download-report" class="btn primary" type="button">↓ Download PDF</button>
+            <button id="share-report" class="btn green" type="button">↗ Share PDF</button>
+            <button id="print-report" class="btn outline" type="button">Print</button>
+          </div>
+        </div>
+        <p id="pdf-status" class="pdf-status" role="status" aria-live="polite"></p>
+        <article class="report" id="pdf-report">
+          <div class="report-head">
+            <div class="brand"><span class="brand-icon">◆</span><div><strong>STATE LIFE</strong><small>POLICY BENEFIT ILLUSTRATION</small></div></div>
+            <div class="report-header-right">03 / 20 PLAN<br><span>ILLUSTRATION</span></div>
+          </div>
+          <div class="report-title">POLICY BENEFIT ILLUSTRATION</div>
+          <div class="report-subtitle" id="i-plan">PLAN</div>
+          <div class="report-grid">
+            <table class="details-table"><tbody>
+              <tr><th>Policy Holder</th><td id="i-name"></td></tr>
+              <tr><th>Illustration Date</th><td id="i-date"></td></tr>
+              <tr><th>Date of Birth</th><td id="i-dob"></td></tr>
+              <tr><th>Age Used</th><td id="i-age"></td></tr>
+              <tr><th>Gender</th><td id="i-gender"></td></tr>
+            </tbody></table>
+            <table class="details-table"><tbody>
+              <tr><th>Policy Term</th><td id="i-term"></td></tr>
+              <tr><th>Sum Assured</th><td id="i-sum"></td></tr>
+              <tr class="highlight"><th>Annual Premium</th><td id="i-premium"></td></tr>
+              <tr><th>Premium Paying Years</th><td id="i-pay-years"></td></tr>
+            </tbody></table>
+          </div>
+          <div class="report-section-title">KEY BENEFITS AT A GLANCE</div>
+          <div class="key-grid">
+            <div class="key-card"><span class="key-icon">◈</span><strong>Maturity Planning</strong><small>See the illustrated end-of-term value.</small></div>
+            <div class="key-card"><span class="key-icon">◷</span><strong>Long-Term Savings</strong><small>Build a regular payment habit over time.</small></div>
+            <div class="key-card"><span class="key-icon">✓</span><strong>Tax Considerations</strong><small>Subject to prevailing tax law and eligibility.</small></div>
+            <div class="key-card"><span class="key-icon">♡</span><strong>Family Financial Security</strong><small>Review applicable protection benefits.</small></div>
+          </div>
+          <div class="report-section-title">YEAR-WISE BENEFIT SUMMARY</div>
+          <div class="table-wrap"><table class="benefits"><thead><tr>
+            <th>Policy Years</th><th>Annual Premium</th><th>Premium in Period</th><th>Natural Death</th><th>Accidental Death</th>
+          </tr></thead><tbody id="payment-rows"></tbody></table></div>
+          <p class="mini-disclosure">Natural death = Sum Assured + applicable bonus. Accidental death = 2 × Sum Assured + applicable bonus (only if eligible cover applies). Bonus not yet calculated.</p>
+          <div class="report-section-title">YOUR POLICY JOURNEY</div>
+          <div class="journey" id="journey"></div>
+          <div class="report-section-title">BENEFIT ILLUSTRATION</div>
+          <div class="benefit-grid">
+            <div class="benefit-box"><span>Sum Assured</span><strong id="b-sum"></strong></div>
+            <div class="benefit-box"><span>Illustrative Scheduled Amount</span><strong id="b-scheduled"></strong><small>As requested: equals Sum Assured, not premium payments</small></div>
+            <div class="benefit-box accent"><span>Illustrative Maturity</span><strong id="b-maturity"></strong><small id="maturity-rule"></small></div>
+          </div>
+          <div class="report-lower">
+            <div>
+              <div class="report-section-title">HOW YOUR PLAN WORKS</div>
+              <div class="steps"><div><b>01</b><span>Choose a policy plan and sum assured</span></div><div><b>02</b><span>Pay the estimated annual premium</span></div><div><b>03</b><span>Review coverage subject to policy conditions</span></div><div><b>04</b><span>Receive applicable maturity benefits at term end</span></div></div>
+              <div class="report-section-title">PROTECTION BENEFITS</div>
+              <div class="protection-grid"><div><span>Natural Death</span><strong id="natural-cover"></strong></div><div><span>Accidental Death</span><strong id="accidental-cover"></strong></div></div>
+              <p class="mini-disclosure">Illustrative formulas only. Bonus, riders, eligibility and claims are not verified.</p>
+            </div>
+            <div>
+              <div class="report-section-title">FINANCIAL OVERVIEW</div>
+              <div class="financial-list"><div><span>Annual Premium</span><b id="f-premium"></b></div><div><span>Actual Total Scheduled Payments</span><b id="f-total"></b></div><div><span>Illustrative Maturity</span><b id="f-maturity"></b></div></div>
+              <div class="report-section-title">ILLUSTRATIVE GROWTH</div>
+              <div class="chart-legend">Premiums paid <i></i> Illustrative maturity</div>
+              <div class="growth-chart"><div class="bar-set"><div class="bar premiums" id="growth-premiums"></div><small>Total Premiums</small></div><div class="bar-set"><div class="bar maturity" id="growth-maturity"></div><small>Maturity*</small></div></div>
+            </div>
+          </div>
+          <div class="report-section-title">ADDITIONAL BENEFITS & CONSIDERATIONS</div>
+          <div class="extras"><span>◉ Savings discipline</span><span>◉ Long-term planning</span><span>◉ Policy servicing</span><span>◉ Surrender/loan rules to verify</span></div>
+          <div class="disclosure">DESIGN / CALCULATION DEMO — NOT AN OFFICIAL STATE LIFE QUOTATION. Premiums are based on the supplied rate table. Maturity multiplier, bonus and death benefit formulas are unverified illustrations, not guaranteed returns or confirmed cover. Confirm terms with the insurer before use with customers.</div>
+        </article>
+      </section>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
+    <script src="script.js" defer></script>
+  </body>
+</html>
