@@ -546,3 +546,19 @@ input[readonly] {
  .report-grid{grid-template-columns:1fr 1fr}.benefits{min-width:0}.disclosure,.benefit-grid,.report-lower,.journey,.key-grid{break-inside:avoid}
  .pdf-status{display:none!important}
 }
+
+/* Final requested adjustments */
+.brand-logo {width:66px;height:66px;object-fit:contain;flex-shrink:0;}
+.report-head .brand-logo {width:50px;height:50px;}
+.column-formula {display:block;font-size:9px;font-weight:500;margin-top:4px;line-height:1.25;}
+.protection-formula {display:block;font-size:10px;color:#537393;margin-top:6px;line-height:1.35;}
+@media (max-width:600px) {.brand-logo{width:48px;height:48px}.report-head .brand-logo{width:42px;height:42px}}
+
+/* Joint-life fields, shown only for Plan 19 */
+.joint-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:0}
+.joint-fields .field{min-width:0}
+#joint-life-fields[hidden]{display:none!important}
+@media(max-width:560px){.joint-fields{grid-template-columns:1fr}}
+
+/* Hide the personal-detail rows for joint-life illustrations. */
+#i-dob-row[hidden],#i-age-row[hidden],#i-gender-row[hidden]{display:none!important}
