@@ -10,7 +10,7 @@
     <header class="site-header">
       <div class="head-inner">
         <div class="brand">
-          <span class="brand-icon">◆</span>
+          <img class="brand-logo" src="https://res.cloudinary.com/devex/image/fetch/ar_1:1,b_transparent,c_pad,f_auto,q_auto,w_320/https://neo-assets.s3.amazonaws.com/assets/0141/5215/StateLifeLogo.png" alt="State Life logo" crossorigin="anonymous" />
           <div>
             <strong>STATE LIFE</strong
             ><small>PREMIUM PLANNING & ILLUSTRATION</small>
@@ -23,6 +23,10 @@
       <div class="intro">
         <span class="eyebrow">INSURANCE PLANNING TOOL</span>
         <h1>Premium Calculator</h1>
+        <p>
+          Calculate an estimated premium and generate a beautifully formatted
+          policy illustration.
+        </p>
       </div>
       <section class="main-grid">
         <div class="panel">
@@ -42,35 +46,40 @@
                   autocomplete="name"
                 />
               </div>
-              <div class="field">
-                <label for="dob">Date of Birth</label
-                ><input id="dob" type="date" required />
+              <div class="field full">
+                <label for="term">Policy Plan</label>
+                <select id="term" required>
+                  <option value="">Select plan</option>
+                  <option value="03_10">Endowment Plan 03/10</option>
+                  <option value="03_15">Endowment Plan 03/15</option>
+                  <option value="03_20">Endowment Plan 03/20</option>
+                  <option value="81_20">Golden Endowment Plan 81/20</option>
+                  <option value="PLATINUM_91">Platinum Plan 91/10</option>
+                  <option value="JEEVAN_19">Jeevan Saathi Plan 19</option>
+                </select>
               </div>
-              <div class="field">
-                <label for="age">Age (Auto)</label
-                ><input
-                  id="age"
-                  readonly
-                  placeholder="Calculated automatically"
-                />
+              <div class="field" id="single-dob-field">
+                <label for="dob">Date of Birth</label>
+                <input id="dob" type="date" required />
               </div>
-              <div class="field">
-                <label for="gender">Gender</label
-                ><select id="gender" required>
+              <div class="field" id="single-age-field">
+                <label for="age">Age (Auto)</label>
+                <input id="age" readonly placeholder="Calculated automatically" />
+              </div>
+              <div id="joint-life-fields" class="field full" hidden>
+                <div class="joint-fields">
+                  <div class="field"><label for="husband-dob">Male Date of Birth</label><input id="husband-dob" type="date" /></div>
+                  <div class="field"><label for="wife-dob">Female Date of Birth</label><input id="wife-dob" type="date" /></div>
+                  <div class="field"><label for="husband-age">Male Age (Auto)</label><input id="husband-age" readonly /></div>
+                  <div class="field"><label for="wife-age">Female Age (Auto)</label><input id="wife-age" readonly /></div>
+                </div>
+              </div>
+              <div class="field full" id="single-gender-field">
+                <label for="gender">Gender</label>
+                <select id="gender" required>
                   <option value="">Select gender</option>
                   <option>Male</option>
                   <option>Female</option>
-                </select>
-              </div>
-              <div class="field">
-                <label for="term">Policy Plan</label
-                ><select id="term" required>
-                  <option value="">Select plan</option>
-                  <option value="03_10">03 / 10</option>
-                  <option value="03_15">03 / 15</option>
-                  <option value="03_20">03 / 20</option>
-                  <option value="81_20">81 / 20</option>
-                  <option value="PLATINUM_91">Platinum 91 / 10</option>
                 </select>
               </div>
               <div class="field full">
@@ -110,7 +119,7 @@
           <div id="results" hidden>
             <div class="stat-grid">
               <div class="stat">
-                <span>Calculated Age</span><strong id="r-age">—</strong>
+                <span>Name</span><strong id="r-name">—</strong>
               </div>
               <div class="stat">
                 <span>Policy Term</span><strong id="r-term">—</strong>
@@ -119,15 +128,12 @@
                 <span>Sum Assured</span><strong id="r-sum">—</strong>
               </div>
               <div class="stat">
-                <span>Rate per Rs 1,000</span><strong id="r-rate">—</strong>
+                <span>Age</span><strong id="r-age">—</strong>
               </div>
             </div>
             <div class="premium-block">
               <span>Estimated Annual Premium</span
               ><strong id="r-premium">—</strong
-              ><small
-                >Profession charges excluded · Rs 100 fixed addition
-                included</small
               >
             </div>
             <div class="buttons stacked">
@@ -138,15 +144,11 @@
               </button>
             </div>
           </div>
-          <p class="notice">
-            Independent design prototype. Rates are from the supplied sample
-            table; not a verified insurer quotation.
-          </p>
         </div>
       </section>
       <section id="illustration" class="illustration" hidden>
         <div class="illustration-actions">
-          <div><h2>Policy Benefit Illustration</h2><p>Approved design · dynamic policy illustration</p></div>
+          <div><h2>Policy Benefit Illustration</h2></div>
           <div class="action-group">
             <button id="download-report" class="btn primary" type="button">↓ Download PDF</button>
             <button id="share-report" class="btn green" type="button">↗ Share PDF</button>
@@ -156,7 +158,7 @@
         <p id="pdf-status" class="pdf-status" role="status" aria-live="polite"></p>
         <article class="report" id="pdf-report">
           <div class="report-head">
-            <div class="brand"><span class="brand-icon">◆</span><div><strong>STATE LIFE</strong><small>POLICY BENEFIT ILLUSTRATION</small></div></div>
+            <div class="brand"><img class="brand-logo" src="https://res.cloudinary.com/devex/image/fetch/ar_1:1,b_transparent,c_pad,f_auto,q_auto,w_320/https://neo-assets.s3.amazonaws.com/assets/0141/5215/StateLifeLogo.png" alt="State Life logo" crossorigin="anonymous" /><div><strong>STATE LIFE</strong><small>POLICY BENEFIT ILLUSTRATION</small></div></div>
             <div class="report-header-right">03 / 20 PLAN<br><span>ILLUSTRATION</span></div>
           </div>
           <div class="report-title">POLICY BENEFIT ILLUSTRATION</div>
@@ -165,9 +167,9 @@
             <table class="details-table"><tbody>
               <tr><th>Policy Holder</th><td id="i-name"></td></tr>
               <tr><th>Illustration Date</th><td id="i-date"></td></tr>
-              <tr><th>Date of Birth</th><td id="i-dob"></td></tr>
-              <tr><th>Age Used</th><td id="i-age"></td></tr>
-              <tr><th>Gender</th><td id="i-gender"></td></tr>
+              <tr id="i-dob-row"><th id="i-dob-label">Date of Birth</th><td id="i-dob"></td></tr>
+              <tr id="i-age-row"><th>Age Used</th><td id="i-age"></td></tr>
+              <tr id="i-gender-row"><th id="i-gender-label">Gender</th><td id="i-gender"></td></tr>
             </tbody></table>
             <table class="details-table"><tbody>
               <tr><th>Policy Term</th><td id="i-term"></td></tr>
@@ -185,24 +187,23 @@
           </div>
           <div class="report-section-title">YEAR-WISE BENEFIT SUMMARY</div>
           <div class="table-wrap"><table class="benefits"><thead><tr>
-            <th>Policy Years</th><th>Annual Premium</th><th>Premium in Period</th><th>Natural Death</th><th>Accidental Death</th>
+            <th>Policy Years</th><th>Annual Premium</th><th>Premium in Period</th><th>Natural Death<small class="column-formula">Sum Assured + Bonus</small></th><th>Accidental Death<small class="column-formula">2 × Sum Assured + Bonus</small></th>
           </tr></thead><tbody id="payment-rows"></tbody></table></div>
-          <p class="mini-disclosure">Natural death = Sum Assured + applicable bonus. Accidental death = 2 × Sum Assured + applicable bonus (only if eligible cover applies). Bonus not yet calculated.</p>
           <div class="report-section-title">YOUR POLICY JOURNEY</div>
           <div class="journey" id="journey"></div>
           <div class="report-section-title">BENEFIT ILLUSTRATION</div>
           <div class="benefit-grid">
             <div class="benefit-box"><span>Sum Assured</span><strong id="b-sum"></strong></div>
-            <div class="benefit-box"><span>Illustrative Scheduled Amount</span><strong id="b-scheduled"></strong><small>As requested: equals Sum Assured, not premium payments</small></div>
-            <div class="benefit-box accent"><span>Illustrative Maturity</span><strong id="b-maturity"></strong><small id="maturity-rule"></small></div>
+            <div class="benefit-box"><span>Illustrative Scheduled Amount</span><strong id="b-scheduled"></strong></div>
+            <div class="benefit-box accent"><span>Illustrative Maturity</span><strong id="b-maturity"></strong></div>
           </div>
           <div class="report-lower">
             <div>
               <div class="report-section-title">HOW YOUR PLAN WORKS</div>
               <div class="steps"><div><b>01</b><span>Choose a policy plan and sum assured</span></div><div><b>02</b><span>Pay the estimated annual premium</span></div><div><b>03</b><span>Review coverage subject to policy conditions</span></div><div><b>04</b><span>Receive applicable maturity benefits at term end</span></div></div>
               <div class="report-section-title">PROTECTION BENEFITS</div>
-              <div class="protection-grid"><div><span>Natural Death</span><strong id="natural-cover"></strong></div><div><span>Accidental Death</span><strong id="accidental-cover"></strong></div></div>
-              <p class="mini-disclosure">Illustrative formulas only. Bonus, riders, eligibility and claims are not verified.</p>
+              <div class="protection-grid"><div><span>Natural Death</span><strong id="natural-cover"></strong><small class="protection-formula">Sum Assured + Bonus</small></div><div><span>Accidental Death</span><strong id="accidental-cover"></strong><small class="protection-formula">2 × Sum Assured + Bonus</small></div></div>
+              
             </div>
             <div>
               <div class="report-section-title">FINANCIAL OVERVIEW</div>
@@ -213,8 +214,7 @@
             </div>
           </div>
           <div class="report-section-title">ADDITIONAL BENEFITS & CONSIDERATIONS</div>
-          <div class="extras"><span>◉ Savings discipline</span><span>◉ Long-term planning</span><span>◉ Policy servicing</span><span>◉ Surrender/loan rules to verify</span></div>
-          <div class="disclosure">DESIGN / CALCULATION DEMO — NOT AN OFFICIAL STATE LIFE QUOTATION. Premiums are based on the supplied rate table. Maturity multiplier, bonus and death benefit formulas are unverified illustrations, not guaranteed returns or confirmed cover. Confirm terms with the insurer before use with customers.</div>
+          <div class="extras"><span>◉ Savings discipline</span><span>◉ Long-term planning</span><span>◉ Policy servicing</span><span>◉ Loan facility: up to 80% of eligible net surrender value, subject to policy terms</span></div>
         </article>
       </section>
     </main>
