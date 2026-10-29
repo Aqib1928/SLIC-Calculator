@@ -322,15 +322,15 @@ const jeevanRates = {
   "49": 99.37,
   "50": 104.3
 };
-const diff19 = [[1,0],[3,1],[6,2],[9,3],[13,4],[17,5],[24,6],[33,7]];
-function get19Diff(gap){const found=diff19.find(([max])=>gap<=max);return found?found[1]:null;}
+const diff19 = [[1, 0], [3, 1], [6, 2], [9, 3], [13, 4], [17, 5], [24, 6], [33, 7]];
+function get19Diff(gap) { const found = diff19.find(([max]) => gap <= max); return found ? found[1] : null; }
 const labels = {
   "03_10": "Endowment Plan 03/10",
   "03_15": "Endowment Plan 03/15",
   "03_20": "Endowment Plan 03/20",
   "81_20": "Golden Endowment Plan 81/20",
   PLATINUM_91: "Platinum Plan 91/10",
-  JEEVAN_19: "Jeevan Saathi Plan 19",
+  JEEVAN_19: "Jeevan Saathi Plan 19/20",
 };
 const terms = {
   "03_10": 10,
@@ -375,108 +375,113 @@ function getAge() {
   if ($("gender").value === "Female") age = Math.max(20, age - 2);
   return age;
 }
-function getDobAge(id){
- const value=$(id).value;if(!value)return null;
- const p=value.split('-').map(Number),d=new Date(p[0],p[1]-1,p[2]),today=new Date();
- if(d.getFullYear()!==p[0]||d.getMonth()!==p[1]-1||d.getDate()!==p[2]||d>today)return null;
- return ageNearestBirthday(d,today);
+function getDobAge(id) {
+  const value = $(id).value; if (!value) return null;
+  const p = value.split('-').map(Number), d = new Date(p[0], p[1] - 1, p[2]), today = new Date();
+  if (d.getFullYear() !== p[0] || d.getMonth() !== p[1] - 1 || d.getDate() !== p[2] || d > today) return null;
+  return ageNearestBirthday(d, today);
 }
-function updateJointAges(){
- for(const [dob,age] of [['husband-dob','husband-age'],['wife-dob','wife-age']]){
-   const value=getDobAge(dob);$(age).value=value===null?'':value+' Years';
- }
+function updateJointAges() {
+  for (const [dob, age] of [['husband-dob', 'husband-age'], ['wife-dob', 'wife-age']]) {
+    const value = getDobAge(dob); const rateAge = value === null ? null : (dob === 'wife-dob' ? value - 2 : value); $(age).value = rateAge === null ? '' : rateAge + ' Years';
+  }
 }
-function updateJointFields(){
- const joint=$('term').value==='JEEVAN_19';
- $('joint-life-fields').hidden=!joint;
- for(const id of ['single-dob-field','single-age-field','single-gender-field'])$(id).hidden=joint;
- $('dob').required=!joint;$('gender').required=!joint;
- $('husband-dob').required=joint;$('wife-dob').required=joint;
+function updateJointFields() {
+  const joint = $('term').value === 'JEEVAN_19';
+  $('joint-life-fields').hidden = !joint;
+  for (const id of ['single-dob-field', 'single-age-field', 'single-gender-field']) $(id).hidden = joint;
+  $('dob').required = !joint; $('gender').required = !joint;
+  $('husband-dob').required = joint; $('wife-dob').required = joint;
 }
-$('term').addEventListener('change',()=>{updateJointFields();clear()});
-function updateAge(){$('age').value=getAge()===null?'':getAge()+' Years';}
-['dob','gender'].forEach(id=>$(id).addEventListener('change',updateAge));
-['husband-dob','wife-dob'].forEach(id=>$(id).addEventListener('change',updateJointAges));
-const now=new Date();const todayString=[now.getFullYear(),String(now.getMonth()+1).padStart(2,'0'),String(now.getDate()).padStart(2,'0')].join('-');
-for(const id of ['dob','husband-dob','wife-dob'])$(id).max=todayString;
+$('term').addEventListener('change', () => { updateJointFields(); clear() });
+function updateAge() { $('age').value = getAge() === null ? '' : getAge() + ' Years'; }
+['dob', 'gender'].forEach(id => $(id).addEventListener('change', updateAge));
+['husband-dob', 'wife-dob'].forEach(id => $(id).addEventListener('change', updateJointAges));
+const now = new Date(); const todayString = [now.getFullYear(), String(now.getMonth() + 1).padStart(2, '0'), String(now.getDate()).padStart(2, '0')].join('-');
+for (const id of ['dob', 'husband-dob', 'wife-dob']) $(id).max = todayString;
 updateJointFields();
-let current=null;
-function clear(){current=null;$('results').hidden=true;$('empty').hidden=false;$('illustration').hidden=true;$('error').textContent='';$('pdf-status').textContent=''}
-$('calculator').addEventListener('reset',()=>setTimeout(()=>{clear();updateAge();updateJointAges();updateJointFields()},0));
-['name','dob','gender','term','sum','husband-dob','wife-dob'].forEach(id=>$(id).addEventListener('input',()=>{if(current)clear()}));
-$('calculator').addEventListener('submit',e=>{
- e.preventDefault();clear();
- const name=$('name').value.trim(),term=$('term').value,sum=Number($('sum').value);
- if(!name||!term||!$('sum').value||!Number.isFinite(sum)||sum<=0||sum>1e9){$('error').textContent='Please complete all fields with valid values.';return;}
- let age,rate,dob,gender,joint=null;
- if(term==='JEEVAN_19'){
-   const maleAge=getDobAge('husband-dob'),femaleAge=getDobAge('wife-dob');
-   if(maleAge===null||femaleAge===null){$('error').textContent='Enter valid dates of birth for both male and female.';return;}
-   const gap=Math.abs(maleAge-femaleAge),diff=get19Diff(gap);
-   if(diff===null){$('error').textContent='Age difference is outside the supplied 19 DIFF table (0–33 years).';return;}
-   age=Math.max(maleAge,femaleAge)-diff;
-   rate=jeevanRates[age];
-   if(typeof rate!=='number'){$('error').textContent='19/20 rate is unavailable for adjusted age '+age+'. The supplied table covers ages 20–50.';return;}
-   dob=$('husband-dob').value;gender='Joint Life';
-   joint={maleAge,femaleAge,gap,diff,adjustedAge:age,maleDob:$('husband-dob').value,femaleDob:$('wife-dob').value};
- }else{
-   dob=$('dob').value;gender=$('gender').value;age=getAge();
-   if(!dob||!gender||age===null){$('error').textContent='Please complete all fields with valid values.';return;}
-   rate=rateData[age]?.[term];
-   if(typeof rate!=='number'||!Number.isFinite(rate)){$('error').textContent='No rate available for this age and plan.';return;}
- }
- const adjustedRate=rate+1.25-(sum>300000?0.50:0);
- const premium=(sum/1000)*adjustedRate+100;
- current={name,dob,gender,term,sum,age,rate:adjustedRate,premium,years:terms[term],joint};
- $('r-name').textContent=name; $('r-age').textContent=age+' Years';
- $('r-term').textContent=labels[term];$('r-sum').textContent=money(sum);$('r-premium').textContent=money(premium);
- $('empty').hidden=true;$('results').hidden=false;
+let current = null;
+function clear() { current = null; $('results').hidden = true; $('empty').hidden = false; $('illustration').hidden = true; $('error').textContent = ''; $('pdf-status').textContent = '' }
+$('calculator').addEventListener('reset', () => setTimeout(() => { clear(); updateAge(); updateJointAges(); updateJointFields() }, 0));
+['name', 'dob', 'gender', 'term', 'sum', 'husband-dob', 'wife-dob'].forEach(id => $(id).addEventListener('input', () => { if (current) clear() }));
+$('calculator').addEventListener('submit', e => {
+  e.preventDefault(); clear();
+  const name = $('name').value.trim(), term = $('term').value, sum = Number($('sum').value);
+  if (!name || !term || !$('sum').value || !Number.isFinite(sum) || sum <= 0 || sum > 1e9) { $('error').textContent = 'Please complete all fields with valid values.'; return; }
+  let age, rate, dob, gender, joint = null;
+  if (term === 'JEEVAN_19') {
+    const maleAge = getDobAge('husband-dob'), femaleAge = getDobAge('wife-dob');
+    if (maleAge === null || femaleAge === null) { $('error').textContent = 'Enter valid dates of birth for both male and female.'; return; }
+    const femaleRateAge = femaleAge - 2;
+    const gap = Math.abs(maleAge - femaleRateAge), diff = get19Diff(gap);
+    if (diff === null) { $('error').textContent = 'Age difference is outside the supplied 19 DIFF table (0–33 years).'; return; }
+    age = Math.max(maleAge, femaleRateAge) - diff;
+    rate = jeevanRates[age];
+    if (typeof rate !== 'number') { $('error').textContent = '19/20 rate is unavailable for adjusted age ' + age + '. The supplied table covers ages 20–50.'; return; }
+    dob = $('husband-dob').value; gender = 'Joint Life';
+    joint = { maleAge, femaleAge, femaleRateAge, gap, diff, adjustedAge: age, maleDob: $('husband-dob').value, femaleDob: $('wife-dob').value };
+  } else {
+    dob = $('dob').value; gender = $('gender').value; age = getAge();
+    if (!dob || !gender || age === null) { $('error').textContent = 'Please complete all fields with valid values.'; return; }
+    rate = rateData[age]?.[term];
+    if (typeof rate !== 'number' || !Number.isFinite(rate)) { $('error').textContent = 'No rate available for this age and plan.'; return; }
+  }
+  const adjustedRate = rate + 1.25 - (sum > 300000 ? 0.50 : 0);
+  const premium = (sum / 1000) * adjustedRate + 100;
+  current = { name, dob, gender, term, sum, age, rate: adjustedRate, premium, years: terms[term], joint };
+  $('r-name').textContent = name; $('r-age').textContent = age + ' Years';
+  $('r-term').textContent = labels[term]; $('r-sum').textContent = money(sum); $('r-premium').textContent = money(premium);
+  $('empty').hidden = true; $('results').hidden = false;
 });
-function fillIllustration(){
- if(!current)return;const c=current;
- const values={'i-name':c.name,'i-date':new Date().toLocaleDateString('en-GB'),'i-dob':c.dob.split('-').reverse().join('/'),'i-age':c.age+' Years','i-gender':c.gender,'i-term':c.years+' Years','i-sum':money(c.sum),'i-premium':money(c.premium),'i-pay-years':c.years+' Years','b-sum':money(c.sum),'b-scheduled':money(c.sum),'f-premium':money(c.premium),'f-total':money(c.premium*c.years),'natural-cover':money(c.sum)+' + Bonus','accidental-cover':money(c.sum*2)+' + Bonus'};
- Object.entries(values).forEach(([id,v])=>$(id).textContent=v);
- for(const id of ['i-dob-row','i-age-row','i-gender-row']) $(id).hidden=!!c.joint;
- $('i-plan').textContent=labels[c.term]+' PLAN';
- if(c.joint){
-  $('i-dob').textContent='Male: '+c.joint.maleDob.split('-').reverse().join('/')+' | Female: '+c.joint.femaleDob.split('-').reverse().join('/');
-  $('i-age').textContent='Male '+c.joint.maleAge+' | Female '+c.joint.femaleAge+' | Adjusted '+c.age;
-  $('i-gender').textContent='Joint Life (19 DIFF: '+c.joint.diff+')';
- }
+function fillIllustration() {
+  if (!current) return; const c = current;
+  const values = { 'i-name': c.name, 'i-date': new Date().toLocaleDateString('en-GB'), 'i-dob': c.dob.split('-').reverse().join('/'), 'i-age': c.age + ' Years', 'i-gender': c.gender, 'i-term': c.years + ' Years', 'i-sum': money(c.sum), 'i-premium': money(c.premium), 'i-pay-years': c.years + ' Years', 'b-sum': money(c.sum), 'b-scheduled': money(c.sum), 'f-premium': money(c.premium), 'f-total': money(c.premium * c.years), 'natural-cover': money(c.sum) + ' + Bonus', 'accidental-cover': money(c.sum * 2) + ' + Bonus' };
+  Object.entries(values).forEach(([id, v]) => $(id).textContent = v);
+  for (const id of ['i-dob-row', 'i-age-row', 'i-gender-row']) $(id).hidden = !!c.joint;
+  $('i-plan').textContent = labels[c.term] + ' PLAN';
+  if (c.joint) {
+    $('i-dob').textContent = 'Male: ' + c.joint.maleDob.split('-').reverse().join('/') + ' | Female: ' + c.joint.femaleDob.split('-').reverse().join('/');
+    $('i-age').textContent = 'Male ' + c.joint.maleAge + ' | Female ' + c.joint.femaleRateAge + ' | Adjusted ' + c.age;
+    $('i-gender').textContent = 'Joint Life (19 DIFF: ' + c.joint.diff + ')';
+  }
 
- // User-requested illustrative 5x maturity for 03/20 and Jeevan Saathi 19 only; not a guaranteed insurer benefit.
- const hasMaturity=c.term==='03_20'||c.term==='JEEVAN_19';const maturity=hasMaturity?c.sum*5:null;
- $('b-maturity').textContent=hasMaturity?money(maturity):'Pending verification';$('f-maturity').textContent=hasMaturity?money(maturity):'Pending verification';
- const body=$('payment-rows');body.replaceChildren();
- for(let start=1;start<=c.years;start+=5){const end=Math.min(start+4,c.years),period=end-start+1;const tr=document.createElement('tr');
- [start+'–'+end,money(c.premium),money(c.premium*period),money(c.sum)+' + Bonus',money(c.sum*2)+' + Bonus'].forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.appendChild(td)});body.appendChild(tr)}
- const journey=$('journey');journey.replaceChildren();const milestones=[1,...Array.from({length:Math.ceil(c.years/5)},(_,i)=>Math.min((i+1)*5,c.years))];
- [...new Set(milestones)].forEach(y=>{const el=document.createElement('div');el.className='journey-step';const n=document.createElement('b');n.textContent=y;const label=document.createElement('small');label.textContent=y===c.years?'Maturity*':'Year '+y;el.append(n,label);journey.append(el)});
- const total=c.premium*c.years;const max=Math.max(total,maturity||0,1);
- $('growth-premiums').style.height=(Math.max(9,total/max*100))+'%';$('growth-maturity').style.height=(maturity?Math.max(9,maturity/max*100):9)+'%';$('growth-maturity').style.opacity=maturity?'1':'.2';
- $('illustration').hidden=false;
+  // User-requested illustrative 5x maturity for 03/20 and Jeevan Saathi 19 only; not a guaranteed insurer benefit.
+  const hasMaturity = c.term === '03_20' || c.term === 'JEEVAN_19'; const maturity = hasMaturity ? c.sum * 5 : null;
+  $('b-maturity').textContent = hasMaturity ? money(maturity) : 'Pending verification'; $('f-maturity').textContent = hasMaturity ? money(maturity) : 'Pending verification';
+  const body = $('payment-rows'); body.replaceChildren();
+  for (let start = 1; start <= c.years; start += 5) {
+    const end = Math.min(start + 4, c.years), period = end - start + 1; const tr = document.createElement('tr');
+    [start + '–' + end, money(c.premium), money(c.premium * period), money(c.sum) + ' + Bonus', money(c.sum * 2) + ' + Bonus'].forEach(v => { const td = document.createElement('td'); td.textContent = v; tr.appendChild(td) }); body.appendChild(tr)
+  }
+  const journey = $('journey'); journey.replaceChildren(); const milestones = [1, ...Array.from({ length: Math.ceil(c.years / 5) }, (_, i) => Math.min((i + 1) * 5, c.years))];
+  [...new Set(milestones)].forEach(y => { const el = document.createElement('div'); el.className = 'journey-step'; const n = document.createElement('b'); n.textContent = y; const label = document.createElement('small'); label.textContent = y === c.years ? 'Maturity*' : 'Year ' + y; el.append(n, label); journey.append(el) });
+  const total = c.premium * c.years; const max = Math.max(total, maturity || 0, 1);
+  $('growth-premiums').style.height = (Math.max(9, total / max * 100)) + '%'; $('growth-maturity').style.height = (maturity ? Math.max(9, maturity / max * 100) : 9) + '%'; $('growth-maturity').style.opacity = maturity ? '1' : '.2';
+  $('illustration').hidden = false;
 }
-$('generate').addEventListener('click',()=>{fillIllustration();$('illustration').scrollIntoView({behavior:'smooth'})});
-function printReport(){if(!current)return;fillIllustration();window.print()}
-$('print-report').addEventListener('click',printReport);
-function pdfFilename(){const c=current;const safe=c.name.normalize('NFKD').replace(/[^a-zA-Z0-9 ]/g,'').trim().replace(/\s+/g,'_').slice(0,60)||'Customer';const date=new Date();const stamp=[date.getDate(),date.getMonth()+1,date.getFullYear()].map((v,i)=>i===2?v:String(v).padStart(2,'0')).join('-');return `${safe}_${labels[c.term].replace(/\s*\/\s*/g,'-').replace(/\s+/g,'_')}_${stamp}.pdf`}
-let busy=false;
-async function createPdfBlob(){
- if(!current)throw new Error('Calculate a premium first.');fillIllustration();
- if(typeof html2pdf==='undefined')throw new Error('PDF library is unavailable. Connect to the internet and reload, or use Print → Save as PDF.');
- const el=$('pdf-report');const opts={margin:0,filename:pdfFilename(),image:{type:'jpeg',quality:.98},html2canvas:{scale:2,useCORS:true,backgroundColor:'#ffffff',scrollY:0},jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},pagebreak:{mode:['css','legacy']}};
- return await html2pdf().set(opts).from(el).outputPdf('blob');
+$('generate').addEventListener('click', () => { fillIllustration(); $('illustration').scrollIntoView({ behavior: 'smooth' }) });
+function printReport() { if (!current) return; fillIllustration(); window.print() }
+$('print-report').addEventListener('click', printReport);
+function pdfFilename() { const c = current; const safe = c.name.normalize('NFKD').replace(/[^a-zA-Z0-9 ]/g, '').trim().replace(/\s+/g, '_').slice(0, 60) || 'Customer'; const date = new Date(); const stamp = [date.getDate(), date.getMonth() + 1, date.getFullYear()].map((v, i) => i === 2 ? v : String(v).padStart(2, '0')).join('-'); return `${safe}_${labels[c.term].replace(/\s*\/\s*/g, '-').replace(/\s+/g, '_')}_${stamp}.pdf` }
+let busy = false;
+async function createPdfBlob() {
+  if (!current) throw new Error('Calculate a premium first.'); fillIllustration();
+  if (typeof html2pdf === 'undefined') throw new Error('PDF library is unavailable. Connect to the internet and reload, or use Print → Save as PDF.');
+  const el = $('pdf-report'); const opts = { margin: 0, filename: pdfFilename(), image: { type: 'jpeg', quality: .98 }, html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff', scrollY: 0 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }, pagebreak: { mode: ['css', 'legacy'] } };
+  return await html2pdf().set(opts).from(el).outputPdf('blob');
 }
-async function withPdf(action){if(busy)return;busy=true;const status=$('pdf-status');status.textContent='Preparing your PDF…';try{await action();status.textContent='PDF ready.'}catch(e){status.textContent=e.message||'PDF generation failed.'}finally{busy=false}}
-function downloadBlob(blob,filename){const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),15000)}
-async function downloadPdf(){await withPdf(async()=>{const blob=await createPdfBlob();downloadBlob(blob,pdfFilename())})}
-async function sharePdf(){await withPdf(async()=>{
- const blob=await createPdfBlob();const file=new File([blob],pdfFilename(),{type:'application/pdf'});
- if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
-   try{await navigator.share({files:[file],title:'Policy Benefit Illustration'});return}catch(e){if(e.name==='AbortError')return;}
- }
- downloadBlob(blob,pdfFilename());$('pdf-status').textContent='Direct PDF sharing is not supported in this browser. PDF downloaded instead; attach it in WhatsApp or another app.';
- })}
-$('download').addEventListener('click',downloadPdf);
-$('download-report').addEventListener('click',downloadPdf);
-$('share-report').addEventListener('click',sharePdf);
+async function withPdf(action) { if (busy) return; busy = true; const status = $('pdf-status'); status.textContent = 'Preparing your PDF…'; try { await action(); status.textContent = 'PDF ready.' } catch (e) { status.textContent = e.message || 'PDF generation failed.' } finally { busy = false } }
+function downloadBlob(blob, filename) { const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = filename; document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 15000) }
+async function downloadPdf() { await withPdf(async () => { const blob = await createPdfBlob(); downloadBlob(blob, pdfFilename()) }) }
+async function sharePdf() {
+  await withPdf(async () => {
+    const blob = await createPdfBlob(); const file = new File([blob], pdfFilename(), { type: 'application/pdf' });
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+      try { await navigator.share({ files: [file], title: 'Policy Benefit Illustration' }); return } catch (e) { if (e.name === 'AbortError') return; }
+    }
+    downloadBlob(blob, pdfFilename()); $('pdf-status').textContent = 'Direct PDF sharing is not supported in this browser. PDF downloaded instead; attach it in WhatsApp or another app.';
+  })
+}
+$('download').addEventListener('click', downloadPdf);
+$('download-report').addEventListener('click', downloadPdf);
+$('share-report').addEventListener('click', sharePdf);
