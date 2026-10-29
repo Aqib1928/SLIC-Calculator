@@ -545,7 +545,7 @@ input[readonly] {
  .report-lower{grid-template-columns:1fr 1fr}.key-grid{grid-template-columns:repeat(4,1fr)}.benefit-grid{grid-template-columns:repeat(3,1fr)}
  .report-grid{grid-template-columns:1fr 1fr}.benefits{min-width:0}.disclosure,.benefit-grid,.report-lower,.journey,.key-grid{break-inside:avoid}
  .pdf-status{display:none!important}
-}
+}  
 
 /* Final requested adjustments */
 .brand-logo {width:66px;height:66px;object-fit:contain;flex-shrink:0;}
